@@ -3,6 +3,7 @@ $fn = 64;
 gear_diam = 90;
 gear_thickness = 3;
 gear_spur_depth = 2;
+gear_rim_width = 3;
 
 // Servo head
 module servo_arm() {
@@ -45,8 +46,67 @@ module servo_arm() {
   }
 }
 
-difference() {
-  translate([0, 0, 0.25])
-    cube([37, 20, 2], center=true);
-  servo_arm();
+module servo_mount_mold_box() {
+  difference() {
+    translate([0, 0, 0.25])
+      cube([37, 20, 2], center=true);
+    servo_arm();
+  }
 }
+
+module half_circle_rim(inner, outer) {
+  difference() {
+    circle(d=outer);
+    circle(d=inner);
+    translate([0, -outer/2])
+      square([outer/2, outer]);
+  }
+}
+
+module gear() {
+  outer_diam = gear_diam + 2 * gear_spur_depth;
+  inner_diam = gear_diam - 2 * gear_rim_width;
+
+  difference() {
+    union() {
+      // half moon rim
+      linear_extrude(height=gear_thickness) {
+        half_circle_rim(inner_diam, outer_diam);
+        translate([-gear_rim_width, -gear_diam/2])
+          square([gear_rim_width, gear_diam]);
+
+        // box that fits the servo mount
+        resize([20, 40], center=true) circle(d=1);
+
+        // arm 1
+        rotate([0, 0, 60])
+          square([gear_rim_width, gear_diam/2]);
+
+        // arm 2
+        rotate([0, 0, 120])
+          square([gear_rim_width, gear_diam/2]);
+      }
+    }
+
+    // spur cutout
+    translate([0, 0, gear_thickness/3]) {
+      linear_extrude(height=gear_thickness/3) {
+        half_circle_rim(gear_diam, outer_diam+1);
+      }
+    }
+
+    // servo arm mount cutout
+    translate([0, 0, 1.75/2])
+      rotate([0, 0, 90])
+        servo_arm();
+
+    // cable tie cutouts
+    for(x = [-1, 1])
+      for(y = [-1, 1])
+        translate([x * 5, y * 6, 0])
+          cylinder(d=3, h=gear_thickness);
+  }
+
+}
+
+gear();
