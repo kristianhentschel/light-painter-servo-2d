@@ -1,13 +1,6 @@
 // TODO: Screw mount is a bit too thick, cut another hole in it about halfway through
+include <common.scad>;
 
-$fn = 64;
-
-gear_diam = 90;
-gear_thickness = 4;
-gear_spur_depth = 2;
-gear_rim_width = 3;
-
-function outer_diam(d, fn=$fn) = 1/cos(180/fn) * d;
 
 // Servo head
 module servo_arm() {

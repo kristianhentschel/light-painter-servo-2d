@@ -1,19 +1,8 @@
+include <common.scad>;
 use <gear.scad>;
 
 $fn = 100;
 
-gear_diameter = 90;
-body_length = 23.2;
-body_width = 12.5;
-body_height = 22.6;
-mount_height = 2.8;
-mount_offset = 21 - mount_height;
-mount_length = 32.5;
-gear_hood_diam = 12;
-gear_hood_height = 5.7;
-arm_spacing = 2.5;
-mount_hole_diam = 1.75;
-mount_hole_offset = (27.8 - body_length)/2;
 
 module servo () {
   // origin is mounting point, center of gear attachment
@@ -35,11 +24,9 @@ module servo () {
 }
 
 module example_gear_and_servo() {
-  rotate([90, 0, 90]) {
-    rotate([0, 0, 90])
-      servo();
-    gear();
-  }
+  rotate([0, 0, 90])
+    servo();
+  gear();
 }
 
 module servo_mount_cutout() {
@@ -52,10 +39,7 @@ module servo_mount_cutout() {
   }
 }
 
-rim_width = 3;
-stand_thickness = 3;
-stand_height = 120;
-stand_width = 10;
+rim_width = stand_rim_width;
 
 module triangle_cutouts(n=1, length = stand_width + rim_width) {
   l = length / 2 / n;
@@ -73,27 +57,31 @@ module triangle_cutouts(n=1, length = stand_width + rim_width) {
   }
 }
 
-linear_extrude(height=stand_thickness){
-  difference() {
-    offset(r=rim_width) {
-      hull() {
-        servo_mount_cutout();
-        translate([-stand_width/2, gear_diameter/2 - stand_height])
-          square([stand_width, stand_height]);
+module stand() {
+  linear_extrude(height=stand_thickness){
+    difference() {
+      offset(r=rim_width) {
+        hull() {
+          servo_mount_cutout();
+          translate([-stand_width/2, gear_diameter/2 - stand_height])
+            square([stand_width, stand_height]);
+        }
       }
-    }
-    servo_mount_cutout();
-    translate([-stand_width/2, gear_diameter/2 - rim_width])
-      square([stand_width, stand_thickness]);
-    translate([-stand_width/2, gear_diameter/2 - stand_height])
-      square([stand_width, stand_thickness]);
+      servo_mount_cutout();
+      translate([-stand_width/2, gear_diameter/2 - rim_width])
+        square([stand_width, stand_thickness]);
+      translate([-stand_width/2, gear_diameter/2 - stand_height])
+        square([stand_width, stand_thickness]);
 
-    translate([0, gear_hood_diam]) {
-      triangle_cutouts(n=2, length=gear_diameter / 2 - 2 * rim_width - stand_thickness);
-    }
+      translate([0, gear_hood_diam]) {
+        triangle_cutouts(n=2, length=gear_diameter / 2 - 2 * rim_width - stand_thickness);
+      }
 
-    translate([0, -(stand_height - gear_diameter / 2) + stand_thickness + rim_width]) {
-      triangle_cutouts(n=3, length=stand_height - gear_diameter / 2 - 3 * rim_width - stand_thickness);
+      translate([0, -(stand_height - gear_diameter / 2) + stand_thickness + rim_width]) {
+        triangle_cutouts(n=3, length=stand_height - gear_diameter / 2 - 3 * rim_width - stand_thickness);
+      }
     }
   }
 }
+
+stand();
