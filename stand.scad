@@ -42,7 +42,7 @@ module servo_mount_cutout() {
 rim_width = stand_rim_width;
 
 module triangle_cutouts(n=1, length = stand_width + rim_width) {
-  l = length / 2 / n;
+  l = (length - (2*n - 1) * rim_width) / n;
   for(i = [0:1:n-1]) {
     translate([-stand_width / 2, i * (l + 2 * rim_width)]) {
       polygon([
@@ -74,11 +74,11 @@ module stand() {
         square([stand_width, stand_thickness]);
 
       translate([0, gear_hood_diam]) {
-        triangle_cutouts(n=2, length=gear_diameter / 2 - 2 * rim_width - stand_thickness);
+        triangle_cutouts(n=2, length=gear_diameter / 2 - rim_width - stand_thickness - gear_hood_diam);
       }
 
       translate([0, -(stand_height - gear_diameter / 2) + stand_thickness + rim_width]) {
-        triangle_cutouts(n=3, length=stand_height - gear_diameter / 2 - 3 * rim_width - stand_thickness);
+        triangle_cutouts(n=3, length=stand_height - gear_diameter/2 - 2 * rim_width - stand_thickness - mount_length + gear_hood_diam);
       }
     }
   }
