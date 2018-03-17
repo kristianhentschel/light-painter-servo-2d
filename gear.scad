@@ -9,13 +9,13 @@ gear_rim_width = 3;
 module servo_arm() {
   tip_diameter = 3.75;
   base_diameter = 7;
-  short_arm_length = 15.7;
-  long_arm_length = 18.1;
-  bar_length = 16.45;
+  short_arm_length = 16.0;
+  long_arm_length = 18.6;
+  bar_length = 16.8;
   arm_thickness = 1.75;
   base_thickness = 4;
   screw_height = 5;
-  screw_diam = 4.2;
+  screw_diam = 2.6;
 
   // origin is center of arm attachment (screw center, without base)
   union() {
@@ -49,7 +49,7 @@ module servo_arm() {
 module servo_mount_mold_box() {
   difference() {
     translate([0, 0, 0.25])
-      cube([37, 20, 2], center=true);
+      cube([38, 20, 2], center=true);
     servo_arm();
   }
 }
@@ -109,4 +109,5 @@ module gear() {
 
 }
 
-gear();
+// gear();
+servo_mount_mold_box();
