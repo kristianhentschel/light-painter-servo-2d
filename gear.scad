@@ -1,9 +1,13 @@
+// TODO: Screw mount is a bit too thick, cut another hole in it about halfway through
+
 $fn = 64;
 
 gear_diam = 90;
-gear_thickness = 3;
+gear_thickness = 4;
 gear_spur_depth = 2;
 gear_rim_width = 3;
+
+function outer_diam(d, fn=$fn) = 1/cos(180/fn) * d;
 
 // Servo head
 module servo_arm() {
@@ -14,8 +18,8 @@ module servo_arm() {
   bar_length = 16.8;
   arm_thickness = 1.75;
   base_thickness = 4;
-  screw_height = 6;
-  screw_diam = 2.6;
+  screw_height = base_thickness + gear_thickness;
+  screw_diam = 2.4;
 
   // origin is center of arm attachment (screw center, without base)
   union() {
@@ -41,7 +45,7 @@ module servo_arm() {
     }
     translate([0, 0, -base_thickness + arm_thickness / 2]) {
       cylinder(d=base_diameter, h=base_thickness);
-      cylinder(d=screw_diam, h=screw_height);
+      cylinder(d=outer_diam(screw_diam), h=screw_height);
     }
   }
 }
@@ -70,30 +74,35 @@ module gear() {
   difference() {
     union() {
       // half moon rim
-      linear_extrude(height=gear_thickness) {
-        half_circle_rim(inner_diam, outer_diam);
-        translate([-gear_rim_width, -gear_diam/2])
-          square([gear_rim_width, gear_diam]);
+      difference() {
+        rotate_extrude(angle=180) {
+          translate([inner_diam / 2, 0, 0])
+            difference() {
+              w = gear_rim_width + gear_spur_depth;
+              h = gear_thickness;
+              rt = h/6;
+              square([w, h]);
+              polygon([[w, rt], [w, h - rt], [w - gear_spur_depth, h/2 + rt/2], [w - gear_spur_depth, h/2 - rt/2]]);
+            }
+        }
 
+        // cut off second half, as angle = 180 does not work in this version of openscad
+        linear_extrude(height=gear_thickness)
+          translate([gear_rim_width / 2, -outer_diam/2])
+            square([outer_diam / 2, outer_diam]);
+      }
+
+      linear_extrude(height=gear_thickness) {
         // box that fits the servo mount
         resize([20, 40], center=true) circle(d=1);
 
-        // arm 1
-        rotate([0, 0, 60])
-          square([gear_rim_width, gear_diam/2]);
-
-        // arm 2
-        rotate([0, 0, 120])
-          square([gear_rim_width, gear_diam/2]);
+        for (angle = [0, 60, 120, 180])
+          rotate([0, 0, angle])
+            translate([-gear_rim_width / 2, 0])
+              square([gear_rim_width, gear_diam/2]);
       }
     }
 
-    // spur cutout
-    translate([0, 0, gear_thickness/3]) {
-      linear_extrude(height=gear_thickness/3) {
-        half_circle_rim(gear_diam, outer_diam+1);
-      }
-    }
 
     // servo arm mount cutout
     translate([0, 0, 1.75/2])
@@ -103,11 +112,11 @@ module gear() {
     // cable tie cutouts
     for(x = [-1, 1])
       for(y = [-1, 1])
-        translate([x * 5, y * 6, 0])
-          cylinder(d=3, h=gear_thickness);
+        translate([x * 6, y * 6, 0])
+          cylinder(d=outer_diam(3), h=gear_thickness);
   }
-
 }
 
-gear();
+//rotate([180, 0 ,0])
+  gear();
 // servo_mount_mold_box();
