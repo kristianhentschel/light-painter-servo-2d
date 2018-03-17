@@ -14,7 +14,7 @@ module servo_arm() {
   bar_length = 16.8;
   arm_thickness = 1.75;
   base_thickness = 4;
-  screw_height = 5;
+  screw_height = 6;
   screw_diam = 2.6;
 
   // origin is center of arm attachment (screw center, without base)
@@ -109,5 +109,5 @@ module gear() {
 
 }
 
-// gear();
-servo_mount_mold_box();
+gear();
+// servo_mount_mold_box();
