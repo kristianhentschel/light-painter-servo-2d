@@ -73,7 +73,7 @@ module beam() {
       half_beam();
 }
 
-// beam();
+beam();
 
 // rotate([90, 0, 0]) {
 //   stand();
@@ -81,11 +81,11 @@ module beam() {
 //     stand();
 // }
 
-difference() {
-  half_beam();
-  translate([-10, body_height, 0])
-  cube([20, 60, 100]);
-}
+// difference() {
+//   half_beam();
+//   translate([-10, body_height, 0])
+//   cube([20, 60, 100]);
+// }
 
 // translate([0, -gear_to_stand, 0])
 // rotate([90, 0, 0])
