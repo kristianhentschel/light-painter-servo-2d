@@ -1,8 +1,11 @@
+#include <Arduino.h>
 #include "motion.h"
 #include "debug.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+// #define PRINT_EVERY_TICK
 
 Motion::Motion(int max_feedrate, int tick_duration, int gear_radius, int stage_width, int stage_height, int stage_offset_top){
   _max_feedrate = max_feedrate;
@@ -14,7 +17,24 @@ Motion::Motion(int max_feedrate, int tick_duration, int gear_radius, int stage_w
   _stage_height = stage_height;
   _stage_offset_top = stage_offset_top;
 
+  _pull_length = PI * _gear_radius;
+
+
+  _current_x = 0;
+  _current_y = 0;
+
+  _interpolated_x = 0;
+  _interpolated_y = 0;
+
+  _target_x = 0;
+  _target_y = 0;
+
+  _dwell_ticks = 0;
   _idle = true;
+  _spindle_active = false;
+
+  _move_total_ticks = 0;
+  _move_current_tick = 0;
 }
 
 // returns true: if the command can be immediately executed, false if it needs
@@ -122,17 +142,22 @@ void Motion::_start_move(float x, float y) {
 
   // convert duration to number of ticks
   _move_current_tick = 0;
-  _move_total_ticks = duration / _tick_duration;
+  _move_total_ticks = ceil(duration / _tick_duration);
 
   _idle = false;
 
-  DEBUG_PRINT("MOTION: Starting move to ");
+  DEBUG_PRINT("MOTION: Starting move from ");
+  DEBUG_PRINT(_current_x);
+  DEBUG_PRINT(", ");
+  DEBUG_PRINT(_current_y);
+  DEBUG_PRINT(" to ");
   DEBUG_PRINT(_target_x);
   DEBUG_PRINT(", ");
   DEBUG_PRINT(_target_y);
   DEBUG_PRINT(", duration = ");
   DEBUG_PRINT(duration);
-  DEBUG_PRINTLN(".");
+  DEBUG_PRINT("ms, ticks = ");
+  DEBUG_PRINTLN(_move_total_ticks);
 }
 
 // start a dwell action.
@@ -150,7 +175,7 @@ void Motion::_start_dwell(float seconds) {
 }
 
 float Motion::_interpolate(float start, float end, float t, float duration) {
-  return (end - start) * (t / duration);
+  return start + (end - start) * (t / duration);
 }
 
 // Tick the motion planning.
@@ -165,6 +190,11 @@ void Motion::tick() {
       _idle = true;
     }
 
+    #ifdef PRINT_EVERY_TICK
+    DEBUG_PRINT("MOTION: Dwell ticks remaining: ");
+    DEBUG_PRINTLN(_dwell_ticks);
+    #endif
+
     return;
   }
 
@@ -178,25 +208,45 @@ void Motion::tick() {
     _move_current_tick = 0;
 
     _idle = true;
-  } else if (_move_current_tick < _move_total_ticks){
+  } else {
     // move the interpolated position along for the current tick.
     _move_current_tick++;
 
     _interpolated_x = _interpolate(_current_x, _target_x, _move_current_tick, _move_total_ticks);
     _interpolated_y = _interpolate(_current_y, _target_y, _move_current_tick, _move_total_ticks);
+
+    #ifdef PRINT_EVERY_TICK
+    DEBUG_PRINT("MOTION: Move tick ");
+    DEBUG_PRINT(_move_current_tick);
+    DEBUG_PRINT(" x = ");
+    DEBUG_PRINT(_interpolated_x);
+    DEBUG_PRINT(", y = ");
+    DEBUG_PRINTLN(_interpolated_y);
+    #endif
   }
 }
 
+// Return true if the motion planner is ready to accept the next command.
 bool Motion::idle() {
   return _idle;
 }
 
-// TODO: implement kinematics
-
 float Motion::angle_left() {
-  return 90;
+  float length = sqrt(pow(_stage_height - _interpolated_y, 2) + pow(_interpolated_x, 2));
+  float angle = (_pull_length - length) / (_pull_length) * 180;
+  #ifdef PRINT_EVERY_TICK
+  DEBUG_PRINT("MOTION: left angle =\t\t\t");
+  DEBUG_PRINTLN(angle);
+  #endif
+  return MAX(0, MIN(angle, 180));
 }
 
 float Motion::angle_right() {
-  return 90;
+  float length = sqrt(pow(_stage_height - _interpolated_y, 2) + pow(_stage_width - _interpolated_x, 2));
+  float angle = (_pull_length - length) / (_pull_length) * 180;
+  #ifdef PRINT_EVERY_TICK
+  DEBUG_PRINT("MOTION: right angle =\t");
+  DEBUG_PRINTLN(angle);
+  #endif
+  return MAX(0, MIN(angle, 180));
 }

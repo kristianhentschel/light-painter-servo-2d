@@ -8,6 +8,12 @@ GcodeParser::GcodeParser() {
   _buffer_next = 0;
 
   _emptyCommand.code = _INVALID;
+  _emptyCommand.hasX = false;
+  _emptyCommand.hasY = false;
+  _emptyCommand.hasZ = false;
+  _emptyCommand.hasP = false;
+  _emptyCommand.hasF = false;
+  _emptyCommand.hasS = false;
 }
 
 bool GcodeParser::available() {

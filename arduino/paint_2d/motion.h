@@ -23,6 +23,7 @@ private:
   int _stage_width;
   int _stage_height;
   int _stage_offset_top;
+  float _pull_length;
 
   // Spindle status
   bool _spindle_active;
@@ -44,8 +45,8 @@ private:
   float _target_y;
 
   // duration of and progress within the current interpolated move.
-  float _move_total_ticks;
-  float _move_current_tick;
+  unsigned long _move_total_ticks;
+  unsigned long _move_current_tick;
 
   // selected feedrate for the current move, in mm per second.
   float _feedrate;
