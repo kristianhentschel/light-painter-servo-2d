@@ -13,15 +13,18 @@ gear_to_stand = gear_hood_height + arm_spacing + stand_thickness + (body_height 
 
 module guide() {
   translate([0, -gear_to_stand, 2 * stand_rim_width]) {
-    translate([-stand_thickness/2, 0, 0])
+    translate([-stand_thickness/2, 0, 0]) {
       cube([stand_thickness, gear_to_stand, 3]);
-    translate([stand_thickness, 0, 0]) {
-      idler();
-      rotate([90, 0, 0])
-        idler();
+      translate([0, 0, 0])
+        cube([idler_diam + stand_thickness, idler_diam, idler_diam + gear_thickness]);
     }
-    translate([-stand_thickness / 2, 0, -idler_diam/2])
-      cube([idler_diam + stand_thickness, idler_diam, 2 * stand_thickness]);
+    translate([0, 0, idler_diam]) {
+      translate([idler_diam, 0, 0])
+        idler();
+      translate([0, gear_thickness/3, 0])
+        rotate([90, 0, 0])
+          idler();
+    }
   }
 }
 
@@ -55,12 +58,11 @@ module half_beam() {
           ]);
     }
 
-    translate([stand_thickness/2, body_height - idler_diam, idler_diam])
+    translate([stand_thickness/2, body_height - idler_diam/2, idler_diam])
       rotate([90, 0, 90])
         idler();
 
-    translate([0, -stand_thickness])
-      guide();
+    guide();
   }
 }
 
@@ -72,7 +74,7 @@ module beam() {
 }
 
 // beam();
-//
+
 // rotate([90, 0, 0]) {
 //   stand();
 //   translate([0, 0, -beam_length-stand_thickness])
@@ -84,3 +86,7 @@ difference() {
   translate([-10, body_height, 0])
   cube([20, 60, 100]);
 }
+
+// translate([0, -gear_to_stand, 0])
+// rotate([90, 0, 0])
+// import("gear.stl");
