@@ -19,7 +19,7 @@ void Painter::input(char c) {
   DEBUG_PRINTLN();
 
   if (_gcode_parser->input(c)) {
-    DEBUG_PRINTLN('command parsed');
+    DEBUG_PRINTLN("INPUT: command parsed.");
   }
 }
 

@@ -26,6 +26,7 @@ bool GcodeParser::input(char c) {
   static bool reset = true;
   static bool complete = false;
   static bool complete_parameter = false;
+  static bool complete_code = false;
   static char current_letter;
   static int current_integer;
   static float current_sign;
@@ -38,6 +39,7 @@ bool GcodeParser::input(char c) {
   if (reset) {
     reset = false;
     complete = false;
+    complete_code = false;
     complete_parameter = false;
     state = ACCEPT_CODE_LETTER;
     current_sign = 1;
@@ -67,58 +69,8 @@ bool GcodeParser::input(char c) {
         state = ACCEPT_CODE_DIGIT;
         break;
       } else {
-        if (current_letter == 'G') {
-          switch (current_integer) {
-            case 0:
-              command.code = G0;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            case 1:
-              command.code = G1;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            case 2:
-              command.code = G2;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            case 3:
-              command.code = G3;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            case 4:
-              command.code = G4;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            case 90:
-              command.code = G90;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            case 21:
-              command.code = G21;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            default:
-              DEBUG_PRINTLN('GCODE: Invalid code number for G.');
-              reset = true;
-          }
-        } else if (current_letter == 'M') {
-          switch (current_integer) {
-            case 3:
-              command.code = M03;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            case 5:
-              command.code = M05;
-              state = ACCEPT_PARAMETER_LETTER;
-              break;
-            default:
-              DEBUG_PRINTLN('GCODE: Invalid code number for M.');
-              reset = true;
-          }
-        } else {
-          DEBUG_PRINTLN('GCODE: Invalid code letter.');
-          reset = true;
-        }
+        complete_code = true;
+        state = ACCEPT_PARAMETER_LETTER;
       }
       break;
     case ACCEPT_PARAMETER_LETTER:
@@ -185,6 +137,54 @@ bool GcodeParser::input(char c) {
         state = ACCEPT_PARAMETER_LETTER;
       }
       break;
+  }
+
+  // if we have a complete code, match the letter and integer to a code enum value.
+  if (complete_code) {
+    complete_code = false;
+    if (current_letter == 'G') {
+      switch (current_integer) {
+        case 0:
+          command.code = G0;
+          break;
+        case 1:
+          command.code = G1;
+          break;
+        case 2:
+          command.code = G2;
+          break;
+        case 3:
+          command.code = G3;
+          break;
+        case 4:
+          command.code = G4;
+          break;
+        case 90:
+          command.code = G90;
+          break;
+        case 21:
+          command.code = G21;
+          break;
+        default:
+          DEBUG_PRINTLN("GCODE: Invalid code number for G.");
+          reset = true;
+      }
+    } else if (current_letter == 'M') {
+      switch (current_integer) {
+        case 3:
+          command.code = M03;
+          break;
+        case 5:
+          command.code = M05;
+          break;
+        default:
+          DEBUG_PRINTLN("GCODE: Invalid code number for M.");
+          reset = true;
+      }
+    } else {
+      DEBUG_PRINTLN("GCODE: Invalid code letter.");
+      reset = true;
+    }
   }
 
   // if a parameter value has been completed, store it in the right place.

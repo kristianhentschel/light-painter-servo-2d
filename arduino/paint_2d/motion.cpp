@@ -22,6 +22,7 @@ bool Motion::plan(gcodeCommand *command) {
 
   switch(command->code) {
     case G0:
+      DEBUG_PRINTLN("MOTION: G0");
       // Fast linear reposition.
       // X, Y: End position.
       // F: set repositioning feedrate.
@@ -34,6 +35,7 @@ bool Motion::plan(gcodeCommand *command) {
       return INTERPOLATED;
       break;
     case G1:
+      DEBUG_PRINTLN("MOTION: G1");
       // Linear move.
       // X, Y: End position.
       // F: set move feedrate.
@@ -45,6 +47,7 @@ bool Motion::plan(gcodeCommand *command) {
       return INTERPOLATED;
       break;
     case G2:
+      DEBUG_PRINTLN("MOTION: G2");
       // Circular move clockwise
       // move linearly with current feedrate as not implemented
       DEBUG_PRINTLN("MOTION: G2 not supported, moving linearly.");
@@ -53,6 +56,7 @@ bool Motion::plan(gcodeCommand *command) {
       return INTERPOLATED;
       break;
     case G3:
+      DEBUG_PRINTLN("MOTION: G3");
       // Circular move counter-clockwise
       // move linearly with current feedrate as not implemented
       DEBUG_PRINTLN("MOTION: G3 not supported, moving linearly.");
@@ -61,23 +65,28 @@ bool Motion::plan(gcodeCommand *command) {
       return INTERPOLATED;
       break;
     case G4:
+      DEBUG_PRINTLN("MOTION: G4");
       _start_dwell(command->hasP ? command->P : 0);
       return INTERPOLATED;
       break;
     case G21:
+      DEBUG_PRINTLN("MOTION: G21");
       DEBUG_PRINTLN("MOTION: G21 units in mm, no action taken.");
       return IMMEDIATE;
       break;
     case G90:
+      DEBUG_PRINTLN("MOTION: G90");
       DEBUG_PRINTLN("MOTION: G90 absolute positioning, no action taken.");
       return IMMEDIATE;
       break;
     case M03:
+      DEBUG_PRINTLN("MOTION: M03");
       DEBUG_PRINTLN("MOTION: Spindle on. ignoring S if present.");
       _spindle_active = true;
       return INTERPOLATED;
       break;
     case M05:
+      DEBUG_PRINTLN("MOTION: M05");
       DEBUG_PRINTLN("MOTION: Spindle off. ignoring S if present.");
       _spindle_active = false;
       return INTERPOLATED;
@@ -114,8 +123,9 @@ void Motion::_start_move(float x, float y) {
   DEBUG_PRINT(_target_x);
   DEBUG_PRINT(", ");
   DEBUG_PRINT(_target_y);
-  DEBUG_PRINT(", duration ");
+  DEBUG_PRINT(", duration = ");
   DEBUG_PRINT(duration);
+  DEBUG_PRINTLN(".");
 }
 
 // start a dwell action.
@@ -125,8 +135,9 @@ void Motion::_start_dwell(float seconds) {
   // tick duration is in milliseconds.
   _dwell_ticks = (seconds * 1000.0) / _tick_duration;
 
-  DEBUG_PRINT("MOTION: _start_dwell: ");
-  DEBUG_PRINTLN(seconds);
+  DEBUG_PRINT("MOTION: Starting to dwell for ");
+  DEBUG_PRINT(seconds);
+  DEBUG_PRINTLN(" seconds.");
 }
 
 float Motion::_interpolate(float start, float end, float t, float duration) {
