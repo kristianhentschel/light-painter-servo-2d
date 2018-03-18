@@ -4,11 +4,11 @@
 #include "settings.h"
 
 #ifdef DEBUG
-  #define DEBUG_PRINT Serial.print
-  #define DEBUG_PRINTLN Serial.println
+  #define DEBUG_PRINT(x) Serial.print(x)
+  #define DEBUG_PRINTLN(x) Serial.println(x)
 #else
-  #define DEBUG_PRINT(x) (x)
-  #define DEBUG_PRINTLN(x) (x)
+  #define DEBUG_PRINT(x) x
+  #define DEBUG_PRINTLN(x) x
 #endif
 
 #endif // __DEBUG_H__
