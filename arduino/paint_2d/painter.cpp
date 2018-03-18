@@ -16,14 +16,14 @@ Painter::Painter(void (*write_left)(float), void (*write_right)(float)) {
 void Painter::input(char c) {
   DEBUG_PRINT(c);
 
-  if (_gcode->input(c)) {
+  if (_gcode_parser->input(c)) {
     DEBUG_PRINTLN('command parsed');
   }
 }
 
 void Painter::tick() {
   // Parse buffered gcodes, until one that needs interpolation is encountered.
-  while (_gcode->available() && _motion->parse(_gcode->next()))
+  while (_gcode_parser->available() && _motion->plan(_gcode_parser->next()))
     ;
 
   // Run the motion planning interpolation. This is a no-op if no movements are
