@@ -14,7 +14,9 @@ Painter::Painter(void (*write_left)(float), void (*write_right)(float)) {
 }
 
 void Painter::input(char c) {
+  DEBUG_PRINT("INPUT: ");
   DEBUG_PRINT(c);
+  DEBUG_PRINTLN();
 
   if (_gcode_parser->input(c)) {
     DEBUG_PRINTLN('command parsed');
