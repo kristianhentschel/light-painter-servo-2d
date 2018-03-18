@@ -2,6 +2,7 @@
 #define __GCODE_H__
 
 typedef enum {
+  _INVALID,
   G0,   // reposition TODO is it?
   G1,   // linear interpolation
   G2,   // circular interpolation clockwise

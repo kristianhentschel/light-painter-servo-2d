@@ -10,10 +10,11 @@ public:
   float angle_left();
   float angle_right();
   bool spindle_active();
-  bool plan(gcodeCommand *command);
+  bool plan(gcodeCommand command);
+  bool idle();
 private:
   // currently executed command.
-  gcodeCommand *_command;
+  gcodeCommand _command;
 
   // Overall settings, set in constructor.
   int _max_feedrate;
@@ -51,6 +52,9 @@ private:
 
   // For a dwell (rest) command, keep track of how long is remaining.
   unsigned int _dwell_ticks;
+
+  // Whether there is something to be done on the next tick.
+  bool _idle;
 
 private:
   void _start_move(float x, float y);

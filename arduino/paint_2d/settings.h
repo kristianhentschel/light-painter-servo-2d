@@ -15,7 +15,8 @@
 
 // ## Movement
 //
-// * The MAX_FEEDRATE limites the target movement speed, in mm per second.
+// * The MAX_FEEDRATE limites the target movement speed, in mm per second. This
+//   is also the default, if not set using the F parameter in the program.
 // * The TICK_MILLISECONDS is the duration of a tick in ms. It effectively
 //   controls the interpolation distance between positions.
 // * The GEAR_RADIUS is a proxy for the circumference of the gear, controlling

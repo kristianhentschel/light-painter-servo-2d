@@ -3,12 +3,26 @@
 #include "gcode.h"
 #include "debug.h"
 
-bool GcodeParser::available() {
+GcodeParser::GcodeParser() {
+  _buffer_first = 0;
+  _buffer_next = 0;
 
+  _emptyCommand.code = _INVALID;
 }
 
-gcodeCommand *GcodeParser::next() {
+bool GcodeParser::available() {
+  return (_buffer_first != _buffer_next);
+}
 
+gcodeCommand GcodeParser::next() {
+  if (_buffer_first != _buffer_next) {
+    gcodeCommand command = _buffer[_buffer_first];
+    _buffer_first = (_buffer_first + 1) % GCODE_BUFFER_SIZE;
+    return command;
+  } else {
+    DEBUG_PRINTLN("GCODE ERROR: Buffer underflow, check available() first.");
+    return _emptyCommand;
+  }
 }
 
 enum parserState {
@@ -32,7 +46,6 @@ bool GcodeParser::input(char c) {
   static float current_sign;
   static float current_float;
   static float current_decimal_multiplier;
-  static gcodeCommand emptyCommand;
   static gcodeCommand command;
   static enum parserState state = ACCEPT_CODE_LETTER;
 
@@ -46,7 +59,7 @@ bool GcodeParser::input(char c) {
     current_integer = 0;
     current_float = 0;
     current_decimal_multiplier = 0.1;
-    command = emptyCommand;
+    command = _emptyCommand;
   }
 
   switch(state) {
@@ -223,8 +236,11 @@ bool GcodeParser::input(char c) {
   }
 
   if (complete) {
-    // TODO store the completed command struct somewhere...
     DEBUG_PRINTLN("GCODE: Have complete command.");
+
+    _buffer[_buffer_next] = command;
+    _buffer_next = (_buffer_next + 1) % GCODE_BUFFER_SIZE;
+
     reset = true;
     return true;
   } else {

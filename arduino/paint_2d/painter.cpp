@@ -25,7 +25,7 @@ void Painter::input(char c) {
 
 void Painter::tick() {
   // Parse buffered gcodes, until one that needs interpolation is encountered.
-  while (_gcode_parser->available() && _motion->plan(_gcode_parser->next()))
+  while (_gcode_parser->available() && _motion->idle() && _motion->plan(_gcode_parser->next()))
     ;
 
   // Run the motion planning interpolation. This is a no-op if no movements are
