@@ -11,6 +11,7 @@ public:
   Painter(void (*write_left)(float), void (*write_right)(float));
   void tick();
   void input(char c);
+  bool acceptInput();
 private:
   void (*_write_left)(float);
   void (*_write_right)(float);

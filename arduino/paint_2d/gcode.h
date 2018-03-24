@@ -16,6 +16,7 @@ typedef enum {
 
 typedef struct {
   gcodeCode code;
+  int N;
   float X, Y, Z, S, P, F;
   bool hasX, hasY, hasZ, hasS, hasP, hasF;
 } gcodeCommand;

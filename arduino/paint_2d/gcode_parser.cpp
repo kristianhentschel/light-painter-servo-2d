@@ -6,6 +6,7 @@
 GcodeParser::GcodeParser() {
   _buffer_first = 0;
   _buffer_next = 0;
+  _buffer_items = 0;
 
   _emptyCommand.code = _INVALID;
   _emptyCommand.hasX = false;
@@ -14,16 +15,23 @@ GcodeParser::GcodeParser() {
   _emptyCommand.hasP = false;
   _emptyCommand.hasF = false;
   _emptyCommand.hasS = false;
+  _emptyCommand.N = -1;
 }
 
 bool GcodeParser::available() {
-  return (_buffer_first != _buffer_next);
+  return _buffer_items > 0;
+}
+
+bool GcodeParser::acceptInput() {
+  // is there space in the buffer.
+  return _buffer_items < GCODE_BUFFER_SIZE;
 }
 
 gcodeCommand GcodeParser::next() {
-  if (_buffer_first != _buffer_next) {
+  if (_buffer_items > 0) {
     gcodeCommand command = _buffer[_buffer_first];
     _buffer_first = (_buffer_first + 1) % GCODE_BUFFER_SIZE;
+    _buffer_items -= 1;
     return command;
   } else {
     DEBUG_PRINTLN("GCODE ERROR: Buffer underflow, check available() first.");
@@ -86,7 +94,9 @@ bool GcodeParser::input(char c) {
       if (c >= '0' && c <= '9') {
         current_integer = current_integer * 10 + (c - '0');
         state = ACCEPT_CODE_DIGIT;
-        break;
+      } else if (c == '\n') {
+        complete_code = true;
+        complete = true;
       } else {
         complete_code = true;
         state = ACCEPT_PARAMETER_LETTER;
@@ -101,6 +111,8 @@ bool GcodeParser::input(char c) {
         case 'F':
         case 'P':
         case 'S':
+        case 'N':
+        case '*':
           current_letter = c;
           state = ACCEPT_DIGIT_OR_SIGN;
           break;
@@ -234,6 +246,13 @@ bool GcodeParser::input(char c) {
         command.hasS = true;
         command.S = current_sign * current_float;
         break;
+      case 'N':
+        command.N = current_sign * current_float;
+        break;
+      case '*':
+        DEBUG_PRINT("GCODE: Checksum (ignored) *");
+        DEBUG_PRINTLN(current_sign * current_float);
+        break;
     }
     // and reset for the next parameter.
     complete_parameter = false;
@@ -241,11 +260,16 @@ bool GcodeParser::input(char c) {
     current_float = 0;
   }
 
-  if (complete) {
+  if (complete && !reset) {
     DEBUG_PRINTLN("GCODE: Have complete command.");
 
-    _buffer[_buffer_next] = command;
-    _buffer_next = (_buffer_next + 1) % GCODE_BUFFER_SIZE;
+    if (_buffer_items >= GCODE_BUFFER_SIZE) {
+      DEBUG_PRINTLN("GCODE ERROR: Buffer overflow, check acceptInput() before attempting to parse input. Command dropped.");
+    } else {
+      _buffer[_buffer_next] = command;
+      _buffer_next = (_buffer_next + 1) % GCODE_BUFFER_SIZE;
+      _buffer_items += 1;
+    }
 
     reset = true;
     return true;

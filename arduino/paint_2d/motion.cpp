@@ -45,6 +45,9 @@ Motion::Motion(int max_feedrate, int tick_duration, int gear_radius, int stage_w
 bool Motion::plan(gcodeCommand command) {
   _command = command;
 
+  Serial.print("ok ");
+  Serial.println(command.N);
+
   switch(command.code) {
     case G0:
       DEBUG_PRINTLN("MOTION: G0");

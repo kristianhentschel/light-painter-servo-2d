@@ -41,7 +41,7 @@ void loop() {
     last_tick = now;
   }
 
-  while (Serial.available() > 0) {
+  while (Serial.available() > 0 && painter.acceptInput()) {
     painter.input(Serial.read());
   }
 }

@@ -36,3 +36,7 @@ void Painter::tick() {
   _write_left(_motion->angle_left());
   _write_right(_motion->angle_right());
 }
+
+bool Painter::acceptInput() {
+  return _gcode_parser->acceptInput();
+}

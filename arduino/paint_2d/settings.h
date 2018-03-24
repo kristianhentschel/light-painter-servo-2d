@@ -26,7 +26,7 @@
 // coiled up. The target should then be in a central position, at the top of the
 // stage.
 
-#define MAX_FEEDRATE 10
+#define MAX_FEEDRATE 1000
 #define TICK_MILLISECONDS 10
 #define GEAR_RADIUS 45
 

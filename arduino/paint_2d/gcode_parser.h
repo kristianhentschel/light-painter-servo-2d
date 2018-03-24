@@ -11,11 +11,13 @@ public:
   bool input(char c);
   bool available();
   gcodeCommand next();
+  bool acceptInput();
 private:
   // A circular buffer of parsed commands, re-use the structs.
   gcodeCommand _buffer[GCODE_BUFFER_SIZE];
-  int _buffer_first;
-  int _buffer_next;
+  unsigned int _buffer_first;
+  unsigned int _buffer_next;
+  unsigned int _buffer_items;
 
   gcodeCommand _emptyCommand;
 };
