@@ -31,7 +31,7 @@ Motion::Motion(int max_feedrate, int tick_duration, int gear_radius, int stage_w
 
   _dwell_ticks = 0;
   _idle = true;
-  _spindle_active = false;
+  _spindle = 0;
 
   _move_total_ticks = 0;
   _move_current_tick = 0;
@@ -111,13 +111,13 @@ bool Motion::plan(gcodeCommand command) {
     case M03:
       DEBUG_PRINTLN("MOTION: M03");
       DEBUG_PRINTLN("MOTION: Spindle on. ignoring S if present.");
-      _spindle_active = true;
+      _spindle = true;
       return INTERPOLATED;
       break;
     case M05:
       DEBUG_PRINTLN("MOTION: M05");
       DEBUG_PRINTLN("MOTION: Spindle off. ignoring S if present.");
-      _spindle_active = false;
+      _spindle = false;
       return INTERPOLATED;
       break;
     default:
@@ -253,4 +253,8 @@ float Motion::angle_right() {
   DEBUG_PRINTLN(angle);
   #endif
   return MAX(0, MIN(angle, 180));
+}
+
+int Motion::spindle() {
+  return _spindle;
 }

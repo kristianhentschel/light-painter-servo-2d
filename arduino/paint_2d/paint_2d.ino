@@ -15,7 +15,11 @@ void write_right(float value) {
   servo_right.write(value);
 }
 
-Painter painter(write_left, write_right);
+void write_led(bool value) {
+  digitalWrite(PIN_LED, value);
+}
+
+Painter painter(write_left, write_right, write_led);
 
 // setup() creates the servo objects, enables the LED pin, and opens a Serial port.
 

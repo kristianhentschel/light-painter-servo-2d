@@ -9,7 +9,7 @@ public:
   void tick();
   float angle_left();
   float angle_right();
-  bool spindle_active();
+  int spindle();
   bool plan(gcodeCommand command);
   bool idle();
 private:
@@ -26,7 +26,7 @@ private:
   float _pull_length;
 
   // Spindle status
-  bool _spindle_active;
+  bool _spindle;
 
   // Two settable feedrates, used by G0 and G1, in mm per second
   float _reposition_feedrate;

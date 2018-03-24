@@ -6,9 +6,10 @@
 #include "gcode_parser.h"
 #include "debug.h"
 
-Painter::Painter(void (*write_left)(float), void (*write_right)(float)) {
+Painter::Painter(void (*write_left)(float), void (*write_right)(float), void (*write_led)(int)) {
   _write_left = write_left;
   _write_right = write_right;
+  _write_led = write_led;
   _motion = new Motion(MAX_FEEDRATE, TICK_MILLISECONDS, GEAR_RADIUS, STAGE_WIDTH, STAGE_HEIGHT, STAGE_OFFSET_TOP);
   _gcode_parser = new GcodeParser();
 }
@@ -35,6 +36,7 @@ void Painter::tick() {
   // Send the computed angles to the servo motors.
   _write_left(_motion->angle_left());
   _write_right(_motion->angle_right());
+  _write_led(_motion->spindle());
 }
 
 bool Painter::acceptInput() {
