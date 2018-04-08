@@ -110,14 +110,14 @@ bool Motion::plan(gcodeCommand command) {
       break;
     case M03:
       DEBUG_PRINTLN("MOTION: M03");
-      DEBUG_PRINTLN("MOTION: Spindle on. ignoring S if present.");
-      _spindle = true;
+      DEBUG_PRINTLN("MOTION: Spindle on.");
+      _spindle = (command.hasS ? command.S : 255);
       return INTERPOLATED;
       break;
     case M05:
       DEBUG_PRINTLN("MOTION: M05");
       DEBUG_PRINTLN("MOTION: Spindle off. ignoring S if present.");
-      _spindle = false;
+      _spindle = 0;
       return INTERPOLATED;
       break;
     default:

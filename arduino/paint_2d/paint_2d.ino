@@ -15,8 +15,12 @@ void write_right(float value) {
   servo_right.write(value);
 }
 
-void write_led(bool value) {
-  digitalWrite(PIN_LED, value);
+void write_led(int value) {
+  #if LED_USE_ANALOG_WRITE
+  analogWrite(PIN_LED, value);
+  #else
+  digitalWrite(PIN_LED, value > 0);
+  #endif
 }
 
 Painter painter(write_left, write_right, write_led);

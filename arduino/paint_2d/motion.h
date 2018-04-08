@@ -26,7 +26,7 @@ private:
   float _pull_length;
 
   // Spindle status
-  bool _spindle;
+  int _spindle;
 
   // Two settable feedrates, used by G0 and G1, in mm per second
   float _reposition_feedrate;
