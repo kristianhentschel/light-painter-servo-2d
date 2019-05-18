@@ -93,6 +93,6 @@ Laser [plugin](https://jtechphotonics.com/?page_id=2012) to generate the GCODE.
 
 Set the document unit to `mm` and the size to `120mm` width, `100mm` height.
 
-[settings for laser plugin in inkscape](images/inkscape.png)
+![settings for laser plugin in inkscape](images/inkscape.png)
 
 Copy and paste the generated GCODE into a serial terminal to draw the shape.
