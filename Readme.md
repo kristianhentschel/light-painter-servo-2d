@@ -3,6 +3,9 @@
 A minimal lightpainting robot, using two servos driven by an Arduino mounted to
 a 3D-printed scaffolding and moving an LED suspended by fishing line.
 
+It can draw small shapes created in Inkscape using a GCODE format like a laser
+cutter. Take a long exposure photograph in a dark room to reveal the drawing.
+
 ![a star painted by the finished robot](images/2018-03-24_2557.jpg)
 
 ## Parts list and assembly
@@ -13,7 +16,7 @@ a 3D-printed scaffolding and moving an LED suspended by fishing line.
   * A 5V power supply (3xAA batteries will do for 4.5V)
   * 2x `90S` micro servo (metal gear version preferred, e.g. `MG 90S`)
   * small breadboard and jumper wire
-  * bright LED
+  * bright 3mm LED and appropriate resistor
   * fishing line (thin, flexible, strong, plastic thread)
   * thin wire to connect LED
   * small counterweight, such as a magnet or coin
@@ -24,7 +27,7 @@ a 3D-printed scaffolding and moving an LED suspended by fishing line.
 ### Mechanical assembly
 
 Clip the `foot` to the `stand`, and push in a servo so that the arm is outside,
-as shown in the image above). Secure it with the top screw.
+as shown in the image above. Secure it with the top screw.
 
 Repeat for the other side, then connect the two sides with the `beam`.
 
@@ -46,7 +49,7 @@ to both fishing lines. When both sides are most extended, it should hover close
 to the ground, horizontally centered in the frame.
 
 _I haven't got a good solution for this part yet, I insulated the LED with
-electrical tape, and sandwitched it with more Blue Tack and the fishing
+electrical tape, and sandwiched it with more Blue Tack and the fishing
 lines between two small coins as counterweight._
 
 ### Electronics  
